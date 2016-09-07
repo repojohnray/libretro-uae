@@ -182,7 +182,7 @@ $(GEN)/gencpu: $(EMU)/gencpu.c
 	mkdir -p $(GEN);
 	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(EMU)/gencpu.c $(EMU)/writelog.c $(EMU)/cpudefs.c $(EMU)/readcpu.c
 
-$(GEN)/cpuemu_0.c $(GEN)/cpuemu_11.c $(GEN)/cpuemu_12.c $(GEN)/cpuemu_20.c $(GEN)/cpuemu_21.c $(GEN)/cpuemu_22.c $(GEN)/cpuemu_31.c $(GEN)/cpuemu_32.c $(GEN)/cpuemu_33.c $(GEN)/cpustbl.c $(GEN)/cputbl.h: $(GEN)/gencpu
+$(GEN)/cputbl.h: $(GEN)/gencpu
 	(cd $(GEN); ./gencpu --optimized-flags)
 
 $(GEN)/cpuemu_0.c:	$(GEN)/cputbl.h
