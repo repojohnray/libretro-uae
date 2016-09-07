@@ -6,7 +6,7 @@ RETRODEP = $(CORE_DIR)/retrodep
 JIT      = $(CORE_DIR)/sources/src/jit
 GEN      = $(CORE_DIR)/sources/gen
 
-INCFLAGS := -I$(EMU) -I$(EMU)/include -I$(LIBRETRO) -I$(CORE_DIR)/libretro-include -I$(LIBUTILS) -I$(CORE_DIR)
+INCFLAGS := -I$(EMU) -I$(EMU)/include -I$(LIBRETRO) -I$(CORE_DIR)/libretro-include -I$(LIBUTILS) -I$(CORE_DIR) -I$(GEN)
 
 SOURCES_C +=  $(EMU)/main.c \
 				  $(EMU)/newcpu.c \
@@ -17,8 +17,8 @@ SOURCES_C +=  $(EMU)/main.c \
 				  $(EMU)/dongle.c \
 				  $(EMU)/cia.c \
 				  $(EMU)/blitter.c \
-				  $(EMU)/blittable.c \
-				  $(EMU)/blitfunc.c \
+				  $(GEN)/blittable.c \
+				  $(GEN)/blitfunc.c \
 				  $(EMU)/autoconf.c \
 				  $(EMU)/traps.c\
 				  $(EMU)/keybuf.c \
@@ -111,7 +111,7 @@ SOURCES_C += $(EMU)/hardfile.c \
 				  $(GEN)/cpuemu_32.c  \
 				  $(GEN)/cpuemu_33.c \
 				  $(GEN)/cpustbl.c \
-				  $(EMU)/cpudefs.c \
+				  $(GEN)/cpudefs.c \
 				  $(EMU)/cpummu.c \
 				  $(EMU)/cpummu30.c \
 				  $(EMU)/fpp.c 
@@ -171,16 +171,16 @@ CFLAGS += -DPICASSO96 -DPICASSO96_SUPPORTED
 SOURCES_C += $(EMU)/picasso96.c
 endif
 
-$(GEN)/gencomp: $(JIT)/gencomp.c $(EMU)/writelog.c $(EMU)/cpudefs.c $(EMU)/readcpu.c
+$(GEN)/gencomp: $(JIT)/gencomp.c $(EMU)/writelog.c $(GEN)/cpudefs.c $(EMU)/readcpu.c
 	mkdir -p $(GEN);
-	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(JIT)/gencomp.c $(EMU)/writelog.c $(EMU)/cpudefs.c $(EMU)/readcpu.c
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(JIT)/gencomp.c $(EMU)/writelog.c $(GEN)/cpudefs.c $(EMU)/readcpu.c
 
 $(GEN)/comptbl.h $(GEN)/compstbl.c $(GEN)/compemu.c: $(GEN)/gencomp
 	(cd $(GEN); ./gencomp)
 
-$(GEN)/gencpu: $(EMU)/gencpu.c
+$(GEN)/gencpu: $(EMU)/gencpu.c $(EMU)/writelog.c $(GEN)/cpudefs.c $(EMU)/readcpu.c
 	mkdir -p $(GEN);
-	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(EMU)/gencpu.c $(EMU)/writelog.c $(EMU)/cpudefs.c $(EMU)/readcpu.c
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(EMU)/gencpu.c $(EMU)/writelog.c $(GEN)/cpudefs.c $(EMU)/readcpu.c
 
 $(GEN)/cputbl.h: $(GEN)/gencpu
 	(cd $(GEN); ./gencpu --optimized-flags)
@@ -195,3 +195,39 @@ $(GEN)/cpuemu_31.c:	$(GEN)/cputbl.h
 $(GEN)/cpuemu_32.c:	$(GEN)/cputbl.h
 $(GEN)/cpuemu_33.c:	$(GEN)/cputbl.h
 $(GEN)/cpustbl.c:	$(GEN)/cputbl.h
+
+$(EMU)/custom.o:	$(GEN)/linetoscr.c
+$(EMU)/drawing.o:	$(GEN)/blit.h
+$(EMU)/blitter.o:	$(GEN)/blit.h
+
+
+$(GEN)/genblitter: $(EMU)/genblitter.c $(EMU)/blitops.c $(EMU)/writelog.c
+	mkdir -p $(GEN);
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -o $@ $(EMU)/genblitter.c $(EMU)/blitops.c $(EMU)/writelog.c
+
+$(GEN)/build68k: $(EMU)/build68k.c $(EMU)/writelog.c
+	mkdir -p $(GEN);
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -o $@ $(EMU)/build68k.c $(EMU)/writelog.c
+
+$(GEN)/genlinetoscr: $(EMU)/genlinetoscr.c
+	mkdir -p $(GEN);
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -o $@ $(EMU)/genlinetoscr.c
+
+$(GEN)/cpudefs.c: $(GEN)/build68k
+	(cd $(GEN); ./build68k <../src/table68k >cpudefs.c)
+
+$(GEN)/blit.h:	$(GEN)/genblitter
+	$(GEN)/genblitter i >$(GEN)/blit.h
+
+$(GEN)/blitfunc.c: $(GEN)/genblitter $(GEN)/blitfunc.h
+	$(GEN)/genblitter f >$(GEN)/blitfunc.c
+
+$(GEN)/blitfunc.h: $(GEN)/genblitter
+	$(GEN)/genblitter h >$(GEN)/blitfunc.h
+
+$(GEN)/blittable.c: $(GEN)/genblitter $(GEN)/blitfunc.h
+	$(GEN)/genblitter t >$(GEN)/blittable.c
+
+$(GEN)/linetoscr.c: $(GEN)/genlinetoscr
+	$(GEN)/genlinetoscr >$(GEN)/linetoscr.c #-b: big endian
+
