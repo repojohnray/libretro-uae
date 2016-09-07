@@ -56,10 +56,10 @@ struct cpu_history {
 	uae_u16 * location;
 };
 
-union cacheline {
+typedef union cacheline {
 	cpuop_func * handler;
-	blockinfo_t * bi;
-};
+	struct blockinfo_t * bi;
+} cacheline;
 
 /* Use new spill/reload strategy when calling external functions */
 #define USE_OPTIMIZED_CALLS 0
@@ -150,7 +150,7 @@ extern void build_comp(void);
 extern void set_cache_state(int enabled);
 extern int get_cache_state(void);
 extern uae_u32 get_jitted_size(void);
-extern void (*flush_icache)(int n);
+extern void (*flush_icache_f)(int n);
 extern void alloc_cache(void);
 extern int check_for_cache_miss(void);
 

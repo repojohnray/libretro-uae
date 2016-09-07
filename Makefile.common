@@ -4,6 +4,7 @@ GUI      = $(CORE_DIR)/gui-retro
 LIBRETRO = $(CORE_DIR)/libretro
 RETRODEP = $(CORE_DIR)/retrodep
 JIT      = $(CORE_DIR)/sources/src/jit
+GEN      = $(CORE_DIR)/sources/gen
 
 INCFLAGS := -I$(EMU) -I$(EMU)/include -I$(LIBRETRO) -I$(CORE_DIR)/libretro-include -I$(LIBUTILS) -I$(CORE_DIR)
 
@@ -152,10 +153,10 @@ SOURCES_C += $(LIBRETRO)/libretro.c \
 				 $(LIBRETRO)/diskutils.c \
 				 $(LIBRETRO)/fontmsx.c 
 
-ifeq ($(USE_JIT, 1)
+ifeq ($(USE_JIT), 1)
 CFLAGS += -DJIT
 INCFLAGS += -I$(JIT)
-SOURCES_C +=			 $(JIT)/compemu.c \
+SOURCES_C +=			 $(GEN)/compemu.c \
                                  $(JIT)/compstbl.c \
                                  $(JIT)/compemu_fpp.c \
                                  $(JIT)/compemu_support.c

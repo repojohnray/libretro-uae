@@ -28,7 +28,19 @@
 /* This should eventually end up in machdep/, but for now, x86 is the
    only target, and it's easier this way... */
 
+#include "sysconfig.h"
+#include "sysdeps.h"
+
+#include <stdlib.h>
+
+#include "uae_types.h"
 #include "flags_x86.h"
+#include "options.h"
+#include "memory_uae.h"
+#include "newcpu.h"
+//#include "compemu_codegen.h"
+#include "codegen_x86.h"
+#include "compemu.h"
 
 /*************************************************************************
  * Some basic information about the the target CPU                       *

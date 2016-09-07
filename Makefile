@@ -138,8 +138,16 @@ endif
 %.o: %.S
 	$(CC_AS) $(CFLAGS) -c $^ -o $@
 
+sources/gen/gencomp: sources/src/jit/gencomp.c sources/src/writelog.c sources/src/cpudefs.c sources/src/readcpu.c
+	mkdir -p sources/gen;
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ sources/src/jit/gencomp.c sources/src/writelog.c sources/src/cpudefs.c sources/src/readcpu.c
+
+
+sources/gen/comptbl.h sources/gen/compstbl.c sources/gen/compemu.c: sources/gen/gencomp
+	(cd sources/gen; ./gencomp)
+
 clean:
-	rm -f $(OBJECTS) $(TARGET) 
+	rm -f $(OBJECTS) $(TARGET)
+	rm -Rf sources/gen/
 
 .PHONY: clean
-
