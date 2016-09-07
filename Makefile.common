@@ -175,8 +175,11 @@ $(GEN)/gencomp: $(JIT)/gencomp.c $(EMU)/writelog.c $(GEN)/cpudefs.c $(EMU)/readc
 	mkdir -p $(GEN);
 	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(JIT)/gencomp.c $(EMU)/writelog.c $(GEN)/cpudefs.c $(EMU)/readcpu.c
 
-$(GEN)/comptbl.h $(GEN)/compstbl.c $(GEN)/compemu.c: $(GEN)/gencomp
+$(GEN)/comptbl.h: $(GEN)/gencomp
 	(cd $(GEN); ./gencomp)
+
+$(GEN)/compstbl.c:	$(GEN)/comptbl.h
+$(GEN)/compemu.c:	$(GEN)/comptbl.h
 
 $(GEN)/gencpu: $(EMU)/gencpu.c $(EMU)/writelog.c $(GEN)/cpudefs.c $(EMU)/readcpu.c
 	mkdir -p $(GEN);
@@ -203,11 +206,11 @@ $(EMU)/blitter.o:	$(GEN)/blit.h
 
 $(GEN)/genblitter: $(EMU)/genblitter.c $(EMU)/blitops.c $(EMU)/writelog.c
 	mkdir -p $(GEN);
-	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -o $@ $(EMU)/genblitter.c $(EMU)/blitops.c $(EMU)/writelog.c
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(EMU)/genblitter.c $(EMU)/blitops.c $(EMU)/writelog.c
 
 $(GEN)/build68k: $(EMU)/build68k.c $(EMU)/writelog.c
 	mkdir -p $(GEN);
-	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -o $@ $(EMU)/build68k.c $(EMU)/writelog.c
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(EMU)/build68k.c $(EMU)/writelog.c
 
 $(GEN)/genlinetoscr: $(EMU)/genlinetoscr.c
 	mkdir -p $(GEN);
