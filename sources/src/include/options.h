@@ -633,7 +633,7 @@ extern void target_default_options (struct uae_prefs *, int type);
 extern void target_fixup_options (struct uae_prefs *);
 extern int target_cfgfile_load (struct uae_prefs *, const TCHAR *filename, int type, int isdefault);
 extern void cfgfile_save_options (struct zfile *f, struct uae_prefs *p, int type);
-extern int target_get_display (const TCHAR*);
+extern int target_get_display1 (const TCHAR*);
 extern const TCHAR *target_get_display_name (int, bool);
 
 extern int cfgfile_load (struct uae_prefs *p, const TCHAR *filename, int *type, int ignorelink, int userconfig);

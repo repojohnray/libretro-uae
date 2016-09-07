@@ -1837,12 +1837,12 @@ cfgfile_path (option, value, _T("floppy0soundext"), p->floppyslots[0].dfxclickex
 	if (_tcscmp (option, _T("gfx_display_friendlyname")) == 0 || _tcscmp (option, _T("gfx_display_name")) == 0) {
 		TCHAR tmp[MAX_DPATH];
 		if (cfgfile_string (option, value, _T("gfx_display_friendlyname"), tmp, sizeof tmp / sizeof (TCHAR))) {
-			int num = target_get_display (tmp);
+			int num = target_get_display1 (tmp);
 			if (num >= 0)
 				p->gfx_apmode[APMODE_RTG].gfx_display = p->gfx_apmode[APMODE_NATIVE].gfx_display = num;
 		}
 		if (cfgfile_string (option, value, _T("gfx_display_name"), tmp, sizeof tmp / sizeof (TCHAR))) {
-			int num = target_get_display (tmp);
+			int num = target_get_display1 (tmp);
 			if (num >= 0)
 				p->gfx_apmode[APMODE_RTG].gfx_display = p->gfx_apmode[APMODE_NATIVE].gfx_display = num;
 		}
@@ -1851,12 +1851,12 @@ cfgfile_path (option, value, _T("floppy0soundext"), p->floppyslots[0].dfxclickex
 	if (_tcscmp (option, _T("gfx_display_friendlyname_rtg")) == 0 || _tcscmp (option, _T("gfx_display_name_rtg")) == 0) {
 		TCHAR tmp[MAX_DPATH];
 		if (cfgfile_string (option, value, _T("gfx_display_friendlyname_rtg"), tmp, sizeof tmp / sizeof (TCHAR))) {
-			int num = target_get_display (tmp);
+			int num = target_get_display1 (tmp);
 			if (num >= 0)
 				p->gfx_apmode[APMODE_RTG].gfx_display = num;
 		}
 		if (cfgfile_string (option, value, _T("gfx_display_name_rtg"), tmp, sizeof tmp / sizeof (TCHAR))) {
-			int num = target_get_display (tmp);
+			int num = target_get_display1 (tmp);
 			if (num >= 0)
 				p->gfx_apmode[APMODE_RTG].gfx_display = num;
 		}

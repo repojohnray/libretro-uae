@@ -734,7 +734,7 @@ void update_debug_info(void)
 
 #ifdef RETRO
 const TCHAR *target_get_display_name (int num, bool friendlyname){return NULL;}
-int target_get_display (const TCHAR *name){return -1;}
+int target_get_display1 (const TCHAR *name){return -1;}
 int target_checkcapslock (int scancode, int *state){return 0;}
 void setmaintitle(){}
 #endif
@@ -776,7 +776,8 @@ struct MultiDisplay *getdisplay (struct uae_prefs *p)
 	return getdisplay2 (p, -1);
 }
 
-int target_get_display (const TCHAR *name)
+#ifndef RETRO
+int target_get_display1 (const TCHAR *name)
 {
 	int oldfound = -1;
 	int found = -1;
@@ -799,6 +800,7 @@ int target_get_display (const TCHAR *name)
 	}
 	return -1;
 }
+
 const TCHAR *target_get_display_name (int num, bool friendlyname)
 {
 	if (num <= 0)
@@ -810,6 +812,7 @@ const TCHAR *target_get_display_name (int num, bool friendlyname)
 		return md->monitorname;
 	return md->monitorid;
 }
+#endif /*RETRO*/
 #endif
 static int isfullscreen_2 (struct uae_prefs *p)
 {

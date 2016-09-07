@@ -425,7 +425,11 @@ STATIC_INLINE void alloc_blockinfos(void)
 /********************************************************************
  * Preferences handling. This is just a convenient place to put it  *
  ********************************************************************/
+#ifdef PICASSO96
 extern bool have_done_picasso;
+#else /*PICASSO96*/
+#define have_done_picasso 1
+#endif /*PICASSO96*/
 
 bool check_prefs_changed_comp (void)
 {

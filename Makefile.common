@@ -20,7 +20,7 @@ SOURCES_C +=  $(EMU)/main.c \
 				  $(EMU)/blittable.c \
 				  $(EMU)/blitfunc.c \
 				  $(EMU)/autoconf.c \
-				  $(EMU)/traps.o\
+				  $(EMU)/traps.c\
 				  $(EMU)/keybuf.c \
 				  $(EMU)/expansion.c \
 				  $(EMU)/inputrecord.c \
@@ -101,17 +101,17 @@ SOURCES_C += $(EMU)/hardfile.c \
 				  $(EMU)/fsdb.c \
 				  $(EMU)/fsdb_unix.c \
 				  $(EMU)/bsdsocket.c \
-				  $(EMU)/cpuemu_0.c \
-				  $(EMU)/cpuemu_11.c \
-				  $(EMU)/cpuemu_12.c \
-				  $(EMU)/cpuemu_20.c \
-				  $(EMU)/cpuemu_21.c \
-				  $(EMU)/cpuemu_22.c \
-				  $(EMU)/cpustbl.c \
+				  $(GEN)/cpuemu_0.c \
+				  $(GEN)/cpuemu_11.c \
+				  $(GEN)/cpuemu_12.c \
+				  $(GEN)/cpuemu_20.c \
+				  $(GEN)/cpuemu_21.c \
+				  $(GEN)/cpuemu_22.c \
+				  $(GEN)/cpuemu_31.c \
+				  $(GEN)/cpuemu_32.c  \
+				  $(GEN)/cpuemu_33.c \
+				  $(GEN)/cpustbl.c \
 				  $(EMU)/cpudefs.c \
-				  $(EMU)/cpuemu_31.c \
-				  $(EMU)/cpuemu_32.c  \
-				  $(EMU)/cpuemu_33.c \
 				  $(EMU)/cpummu.c \
 				  $(EMU)/cpummu30.c \
 				  $(EMU)/fpp.c 
@@ -155,11 +155,43 @@ SOURCES_C += $(LIBRETRO)/libretro.c \
 
 ifeq ($(USE_JIT), 1)
 CFLAGS += -DJIT
-INCFLAGS += -I$(JIT)
+INCFLAGS += -I$(JIT) -I$(GEN)
 SOURCES_C +=			 $(GEN)/compemu.c \
-                                 $(JIT)/compstbl.c \
+                                 $(GEN)/compstbl.c \
                                  $(JIT)/compemu_fpp.c \
                                  $(JIT)/compemu_support.c
+
+$(JIT)/compemu_support.c: $(GEN)/comptbl.h
 endif
 
 CFLAGS += -DLIBRETRO_PUAE
+
+ifeq (0, 1)
+CFLAGS += -DPICASSO96 -DPICASSO96_SUPPORTED
+SOURCES_C += $(EMU)/picasso96.c
+endif
+
+$(GEN)/gencomp: $(JIT)/gencomp.c $(EMU)/writelog.c $(EMU)/cpudefs.c $(EMU)/readcpu.c
+	mkdir -p $(GEN);
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(JIT)/gencomp.c $(EMU)/writelog.c $(EMU)/cpudefs.c $(EMU)/readcpu.c
+
+$(GEN)/comptbl.h $(GEN)/compstbl.c $(GEN)/compemu.c: $(GEN)/gencomp
+	(cd $(GEN); ./gencomp)
+
+$(GEN)/gencpu: $(EMU)/gencpu.c
+	mkdir -p $(GEN);
+	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ $(EMU)/gencpu.c $(EMU)/writelog.c $(EMU)/cpudefs.c $(EMU)/readcpu.c
+
+$(GEN)/cpuemu_0.c $(GEN)/cpuemu_11.c $(GEN)/cpuemu_12.c $(GEN)/cpuemu_20.c $(GEN)/cpuemu_21.c $(GEN)/cpuemu_22.c $(GEN)/cpuemu_31.c $(GEN)/cpuemu_32.c $(GEN)/cpuemu_33.c $(GEN)/cpustbl.c $(GEN)/cputbl.h: $(GEN)/gencpu
+	(cd $(GEN); ./gencpu --optimized-flags)
+
+$(GEN)/cpuemu_0.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_11.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_12.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_20.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_21.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_22.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_31.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_32.c:	$(GEN)/cputbl.h
+$(GEN)/cpuemu_33.c:	$(GEN)/cputbl.h
+$(GEN)/cpustbl.c:	$(GEN)/cputbl.h

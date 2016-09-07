@@ -117,13 +117,13 @@ DEFINES += -DCPUEMU_0 -DCPUEMU_11 -DCPUEMU_12 -DCPUEMU_20 -DCPUEMU_21 -DCPUEMU_2
 DEFINES += -D__LIBRETRO__
 CFLAGS += $(DEFINES) -DRETRO=1 -DINLINE="inline" -std=gnu99 
 
+all: $(TARGET)
+
 include Makefile.common
 
 OBJECTS += $(SOURCES_C:.c=.o) $(SOURCES_CXX:.cpp=.o) $(SOURCES_ASM:.S=.o)
 
 INCDIRS := $(EXTRA_INCLUDES) $(INCFLAGS)
-
-all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 ifeq ($(STATIC_LINKING_LINK),1)
@@ -138,16 +138,9 @@ endif
 %.o: %.S
 	$(CC_AS) $(CFLAGS) -c $^ -o $@
 
-sources/gen/gencomp: sources/src/jit/gencomp.c sources/src/writelog.c sources/src/cpudefs.c sources/src/readcpu.c
-	mkdir -p sources/gen;
-	$(CC) $(CFLAGS) $(PLATFLAGS) $(INCDIRS) -UJIT -o $@ sources/src/jit/gencomp.c sources/src/writelog.c sources/src/cpudefs.c sources/src/readcpu.c
-
-
-sources/gen/comptbl.h sources/gen/compstbl.c sources/gen/compemu.c: sources/gen/gencomp
-	(cd sources/gen; ./gencomp)
-
 clean:
 	rm -f $(OBJECTS) $(TARGET)
-	rm -Rf sources/gen/
+	rm -Rf sources/gen/;
+	find sources/ -name "*.o" | xargs rm -Rf
 
 .PHONY: clean

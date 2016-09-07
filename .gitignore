@@ -1,1 +1,3 @@
 *.o
+puae_libretro.so
+sources/gen/*
